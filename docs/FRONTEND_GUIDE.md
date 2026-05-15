@@ -25,7 +25,7 @@ http://localhost:5173
 Crear o revisar `.env`:
 
 ```env
-VITE_API_URL=http://localhost:3000/api
+VITE_API_URL=https://backend-supermercadoelotro.onrender.com/api
 VITE_APP_NAME=Supermercado Online El Otro
 ```
 
