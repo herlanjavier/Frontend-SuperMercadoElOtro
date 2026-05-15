@@ -4,8 +4,14 @@ import { storage } from '../utils/storage.js';
 
 let lastRateLimitToastAt = 0;
 
+const API_URL = import.meta.env.VITE_API_URL;
+
+if (!API_URL) {
+  throw new Error('Missing VITE_API_URL environment variable');
+}
+
 const api = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || 'http://localhost:3000/api',
+  baseURL: API_URL,
   headers: {
     'Content-Type': 'application/json',
   },
