@@ -1,27 +1,24 @@
-import { useCallback, useEffect, useState } from 'react';
-import { categoryService } from '../services/category.service.js';
+import { useCallback, useEffect, useMemo } from 'react';
+import { useAuthStore } from '../store/auth.store.js';
+import { useCategoryStore } from '../store/category.store.js';
 
 export const useCategories = (params = {}) => {
-  const [categories, setCategories] = useState([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const includeInactive = Boolean(params.includeInactive);
+  const options = useMemo(() => ({ includeInactive }), [includeInactive]);
+  const { categories, isLoading, error, fetchCategories } = useCategoryStore();
+  const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
+  const isAuthLoading = useAuthStore((state) => state.isLoading);
+  const token = useAuthStore((state) => state.token);
 
-  const refetch = useCallback(async () => {
-    setIsLoading(true);
-    setError(null);
-    try {
-      const data = await categoryService.getCategories(params);
-      setCategories(data);
-    } catch (err) {
-      setError(err.userMessage || err.response?.data?.message || 'No se pudieron cargar las categorías.');
-    } finally {
-      setIsLoading(false);
-    }
-  }, [params]);
+  const refetch = useCallback(
+    (fetchOptions = {}) => fetchCategories({ ...options, ...fetchOptions }),
+    [fetchCategories, options],
+  );
 
   useEffect(() => {
+    if (isAuthLoading || !isAuthenticated || !token) return;
     refetch();
-  }, [refetch]);
+  }, [isAuthLoading, isAuthenticated, refetch, token]);
 
   return { categories, isLoading, error, refetch };
 };
