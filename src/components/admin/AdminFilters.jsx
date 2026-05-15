@@ -1,0 +1,18 @@
+import { Search } from 'lucide-react';
+import Input from '../common/Input.jsx';
+
+export default function AdminFilters({ search, onSearch, children }) {
+  return (
+    <section className="soft-card rounded-[1.75rem] p-4">
+      <div className="grid gap-3 lg:grid-cols-[minmax(220px,1fr)_auto] lg:items-end">
+        <Input
+          label="Buscar"
+          value={search || ''}
+          onChange={(event) => onSearch?.(event.target.value)}
+          placeholder="Buscar por nombre, descripcion..."
+        />
+        <div className="grid gap-3 sm:grid-cols-2 lg:flex">{children}</div>
+      </div>
+    </section>
+  );
+}
