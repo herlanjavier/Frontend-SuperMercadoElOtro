@@ -2,6 +2,7 @@ import { Link, useParams } from 'react-router-dom';
 import { ArrowLeft, CreditCard, MapPin, Phone, User } from 'lucide-react';
 import Button from '../../components/common/Button.jsx';
 import EmptyState from '../../components/common/EmptyState.jsx';
+import PaymentProofViewer from '../../components/common/PaymentProofViewer.jsx';
 import OrderStatusBadge from '../../components/customer/OrderStatusBadge.jsx';
 import OrderStatusActions from '../../components/sales/OrderStatusActions.jsx';
 import SalesOrderItemsList from '../../components/sales/SalesOrderItemsList.jsx';
@@ -59,6 +60,8 @@ export default function SalesOrderDetailPage() {
           </div>
         </article>
       </section>
+
+      <PaymentProofViewer order={order} />
 
       <section className="soft-card rounded-[1.75rem] p-5">
         <h3 className="text-lg font-black text-green-950">Repartidor</h3>

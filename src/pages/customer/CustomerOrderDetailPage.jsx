@@ -3,9 +3,11 @@ import { Link, useNavigate, useParams } from 'react-router-dom';
 import { CalendarDays, CheckCircle, CreditCard, MapPin, PackageCheck, Phone, Truck, XCircle } from 'lucide-react';
 import Button from '../../components/common/Button.jsx';
 import EmptyState from '../../components/common/EmptyState.jsx';
+import FakeQrPaymentCard from '../../components/customer/FakeQrPaymentCard.jsx';
 import OrderDetailHeader from '../../components/customer/OrderDetailHeader.jsx';
 import OrderItemsList from '../../components/customer/OrderItemsList.jsx';
 import OrderTimeline from '../../components/customer/OrderTimeline.jsx';
+import PaymentProofUploader from '../../components/customer/PaymentProofUploader.jsx';
 import { useOrderDetail } from '../../hooks/useOrderDetail.js';
 import { formatCurrency } from '../../utils/formatters.js';
 import { canCustomerCancelOrder, formatOrderDate, isOrderPaid } from '../../utils/orderHelpers.js';
@@ -45,15 +47,10 @@ export default function CustomerOrderDetailPage() {
       <OrderTimeline status={order.status} />
 
       {order.status === 'pending_payment' ? (
-        <section className="rounded-[1.75rem] border border-amber-200 bg-amber-50 p-5 text-amber-800">
-          <div className="flex items-start gap-3">
-            <CreditCard className="mt-0.5 h-5 w-5" />
-            <div>
-              <p className="font-black">Pago QR pendiente</p>
-              <p className="mt-1 text-sm">El pedido fue registrado. Realiza el pago por QR y espera la confirmacion del supermercado.</p>
-            </div>
-          </div>
-        </section>
+        <>
+          <FakeQrPaymentCard order={order} />
+          <PaymentProofUploader order={order} onUploaded={refetch} />
+        </>
       ) : null}
 
       <section className="soft-card rounded-[1.75rem] p-5">

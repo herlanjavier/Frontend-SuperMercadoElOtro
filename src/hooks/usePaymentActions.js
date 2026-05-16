@@ -12,7 +12,7 @@ export function usePaymentActions() {
       toast.success('Pago confirmado correctamente.');
       return result;
     } catch (err) {
-      toast.error(err.userMessage || 'No se pudo confirmar el pago.');
+      toast.error(err.userMessage || err.response?.data?.message || 'No se pudo confirmar el pago.');
       throw err;
     } finally {
       setIsConfirming(false);
