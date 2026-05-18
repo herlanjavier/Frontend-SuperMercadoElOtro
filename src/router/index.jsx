@@ -7,6 +7,8 @@ import RoleRoute from '../guards/RoleRoute.jsx';
 import HomePage from '../pages/public/HomePage.jsx';
 import LoginPage from '../pages/public/LoginPage.jsx';
 import RegisterPage from '../pages/public/RegisterPage.jsx';
+import ForgotPasswordPage from '../pages/public/ForgotPasswordPage.jsx';
+import ResetPasswordPage from '../pages/public/ResetPasswordPage.jsx';
 import AuthCallbackPage from '../pages/public/AuthCallbackPage.jsx';
 import AccessDeniedPage from '../pages/public/AccessDeniedPage.jsx';
 import CustomerDashboardPage from '../pages/customer/CustomerDashboardPage.jsx';
@@ -62,6 +64,8 @@ const router = createBrowserRouter([
     children: [
       { path: '/login', element: <LoginPage /> },
       { path: '/register', element: <RegisterPage /> },
+      { path: '/forgot-password', element: <ForgotPasswordPage /> },
+      { path: '/reset-password', element: <ResetPasswordPage /> },
       { path: '/auth/callback', element: <AuthCallbackPage /> },
     ],
   },

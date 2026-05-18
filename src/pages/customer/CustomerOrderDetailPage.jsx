@@ -10,6 +10,7 @@ import OrderTimeline from '../../components/customer/OrderTimeline.jsx';
 import PaymentProofUploader from '../../components/customer/PaymentProofUploader.jsx';
 import { useOrderDetail } from '../../hooks/useOrderDetail.js';
 import { formatCurrency } from '../../utils/formatters.js';
+import { getDeliveryPersonFromOrder } from '../../utils/deliveryHelpers.js';
 import { canCustomerCancelOrder, formatOrderDate, isOrderPaid } from '../../utils/orderHelpers.js';
 
 export default function CustomerOrderDetailPage() {
@@ -26,9 +27,8 @@ export default function CustomerOrderDetailPage() {
     return <EmptyState title="Pedido no encontrado" description={error} actionLabel="Volver a pedidos" onAction={() => navigate('/customer/orders')} />;
   }
 
-  const deliveryName = [order.deliveryPersonFirstName || order.delivery_person_first_name, order.deliveryPersonLastName || order.delivery_person_last_name]
-    .filter(Boolean)
-    .join(' ');
+  const delivery = getDeliveryPersonFromOrder(order);
+  const deliveryName = [delivery.firstName, delivery.lastName].filter(Boolean).join(' ');
 
   const handleCancel = async () => {
     await cancelOrder();
@@ -61,11 +61,11 @@ export default function CustomerOrderDetailPage() {
           <p className="flex items-center gap-2"><PackageCheck className="h-4 w-4 text-green-700" /> Entregado: {formatOrderDate(order.deliveredAt || order.delivered_at)}</p>
           <p className="flex items-center gap-2"><MapPin className="h-4 w-4 text-green-700" /> {order.deliveryAddress || order.delivery_address || 'Sin direccion'}</p>
           <p className="flex items-center gap-2"><Truck className="h-4 w-4 text-green-700" /> Repartidor: {deliveryName || 'Aun no asignado'}</p>
-          {(order.deliveryPersonPhone || order.delivery_person_phone) ? (
-            <p className="flex items-center gap-2"><Phone className="h-4 w-4 text-green-700" /> {order.deliveryPersonPhone || order.delivery_person_phone}</p>
+          {delivery.phone ? (
+            <p className="flex items-center gap-2"><Phone className="h-4 w-4 text-green-700" /> {delivery.phone}</p>
           ) : null}
-          {(order.deliveryPersonVehicleType || order.delivery_person_vehicle_type || order.deliveryPersonPlate || order.delivery_person_plate) ? (
-            <p className="flex items-center gap-2"><Truck className="h-4 w-4 text-green-700" /> {[order.deliveryPersonVehicleType || order.delivery_person_vehicle_type, order.deliveryPersonPlate || order.delivery_person_plate].filter(Boolean).join(' - ')}</p>
+          {(delivery.vehicleType || delivery.plate) ? (
+            <p className="flex items-center gap-2"><Truck className="h-4 w-4 text-green-700" /> {[delivery.vehicleType, delivery.plate].filter(Boolean).join(' - ')}</p>
           ) : null}
         </div>
         <div className="mt-5 rounded-2xl bg-green-50 p-4">
