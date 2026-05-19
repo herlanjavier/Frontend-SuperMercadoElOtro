@@ -4,10 +4,16 @@ import { businessHourService } from '../services/business-hour.service.js';
 
 const timePattern = /^([01]\d|2[0-3]):[0-5]\d$/;
 
+const normalizeTime = (value, fallback) => {
+  if (!value) return fallback;
+  const match = String(value).trim().match(/^([01]\d|2[0-3]):([0-5]\d)/);
+  return match ? `${match[1]}:${match[2]}` : value;
+};
+
 const normalizeHour = (hour) => ({
   dayOfWeek: Number(hour.dayOfWeek),
-  opensAt: hour.opensAt || '06:00',
-  closesAt: hour.closesAt || '22:00',
+  opensAt: normalizeTime(hour.opensAt, '06:00'),
+  closesAt: normalizeTime(hour.closesAt, '22:00'),
   isOpen: Boolean(hour.isOpen),
 });
 
@@ -53,8 +59,8 @@ export const useBusinessHoursAdmin = () => {
 
   const updateHour = useCallback(async (dayOfWeek, payload) => {
     const normalizedPayload = {
-      opensAt: payload.opensAt || '06:00',
-      closesAt: payload.closesAt || '22:00',
+      opensAt: normalizeTime(payload.opensAt, '06:00'),
+      closesAt: normalizeTime(payload.closesAt, '22:00'),
       isOpen: Boolean(payload.isOpen),
     };
     const validation = validateHour(dayOfWeek, normalizedPayload);
