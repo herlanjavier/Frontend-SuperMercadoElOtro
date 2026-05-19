@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
-import { orderService } from '../services/order.service.js';
+import { businessHourService } from '../services/business-hour.service.js';
 
 export const useBusinessHours = () => {
   const [status, setStatus] = useState(null);
@@ -10,7 +10,7 @@ export const useBusinessHours = () => {
     setIsLoading(true);
     setError(null);
     try {
-      const data = await orderService.getBusinessHoursStatus();
+      const data = await businessHourService.getCurrentBusinessStatus();
       setStatus(data);
     } catch (err) {
       setError(err.userMessage || err.response?.data?.message || 'No se pudo consultar el horario de atención.');

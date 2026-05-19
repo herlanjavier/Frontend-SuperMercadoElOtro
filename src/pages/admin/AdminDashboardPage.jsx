@@ -1,4 +1,4 @@
-import { AlertTriangle, Boxes, ClipboardList, ClipboardPlus, FileBarChart, Package, Plus, RefreshCw, ShoppingCart, Truck, Users } from 'lucide-react';
+import { AlertTriangle, Boxes, Clock, ClipboardList, ClipboardPlus, FileBarChart, Package, Plus, RefreshCw, ShoppingCart, Truck, Users } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import AdminStatsCard from '../../components/admin/AdminStatsCard.jsx';
 import Button from '../../components/common/Button.jsx';
@@ -51,6 +51,7 @@ export default function AdminDashboardPage() {
     { label: 'Registrar entrada', to: '/admin/inventory/new-entry', icon: ClipboardPlus },
     { label: 'Crear producto', to: '/admin/products/new', icon: Plus },
     { label: 'Gestionar usuarios', to: '/admin/users', icon: Users },
+    { label: 'Editar horario de atención', to: '/admin/settings/business-hours', icon: Clock },
     { label: 'Pedidos pendientes', to: '/sales/orders/pending-payments', icon: Truck },
   ];
 
@@ -78,7 +79,7 @@ export default function AdminDashboardPage() {
 
       <section className="soft-card rounded-[2rem] p-6">
         <p className="text-sm font-black uppercase tracking-wide text-green-700">Accesos rapidos</p>
-        <div className="mt-5 grid gap-3 sm:grid-cols-2 xl:grid-cols-5">
+        <div className="mt-5 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
           {quickLinks.map(({ label, to, icon: Icon }) => (
             <Link key={label} to={to}>
               <Button variant="secondary" icon={Icon} className="w-full justify-start">{label}</Button>

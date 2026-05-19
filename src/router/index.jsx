@@ -36,6 +36,7 @@ import AdminReportsPage from '../pages/admin/AdminReportsPage.jsx';
 import AdminUsersPage from '../pages/admin/AdminUsersPage.jsx';
 import AdminUserDetailPage from '../pages/admin/AdminUserDetailPage.jsx';
 import AdminCreateSalesManagerPage from '../pages/admin/AdminCreateSalesManagerPage.jsx';
+import AdminBusinessHoursPage from '../pages/admin/AdminBusinessHoursPage.jsx';
 import SalesReportPage from '../pages/admin/SalesReportPage.jsx';
 import InventoryReportPage from '../pages/admin/InventoryReportPage.jsx';
 import TopProductsReportPage from '../pages/admin/TopProductsReportPage.jsx';
@@ -109,6 +110,7 @@ const router = createBrowserRouter([
               { path: '/admin/users', element: <AdminUsersPage /> },
               { path: '/admin/users/new-sales-manager', element: <AdminCreateSalesManagerPage /> },
               { path: '/admin/users/:id', element: <AdminUserDetailPage /> },
+              { path: '/admin/settings/business-hours', element: <AdminBusinessHoursPage /> },
               { path: '/admin/reports', element: <AdminReportsPage /> },
               { path: '/admin/reports/sales', element: <SalesReportPage /> },
               { path: '/admin/reports/inventory', element: <InventoryReportPage /> },

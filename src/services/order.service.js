@@ -1,4 +1,5 @@
 import api from './api.js';
+import { businessHourService } from './business-hour.service.js';
 
 export const orderService = {
   async createOrder(payload) {
@@ -7,7 +8,6 @@ export const orderService = {
   },
 
   async getBusinessHoursStatus() {
-    const { data } = await api.get('/orders/business-hours/current-status');
-    return data.data;
+    return businessHourService.getCurrentBusinessStatus();
   },
 };

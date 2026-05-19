@@ -1,5 +1,5 @@
 import { Link, NavLink } from 'react-router-dom';
-import { BadgeCheck, BarChart3, Bell, Boxes, ClipboardList, CreditCard, FileBarChart, Home, LogOut, Package, PackageCheck, Receipt, ShoppingBag, ShoppingCart, Tags, TrendingDown, Truck, UserRound, Users } from 'lucide-react';
+import { BadgeCheck, BarChart3, Bell, Boxes, ClipboardList, Clock, CreditCard, FileBarChart, Home, LogOut, Package, PackageCheck, Receipt, ShoppingBag, ShoppingCart, Tags, TrendingDown, Truck, UserRound, Users } from 'lucide-react';
 import Logo from '../common/Logo.jsx';
 import { useAuth } from '../../hooks/useAuth.js';
 import { ROLES } from '../../utils/constants.js';
@@ -23,6 +23,7 @@ const navByRole = {
     { label: 'Stock bajo', to: '/admin/inventory/low-stock', icon: TrendingDown },
     { label: 'Notificaciones', to: '/admin/notifications', icon: Bell },
     { label: 'Usuarios', to: '/admin/users', icon: Users },
+    { label: 'Horario', to: '/admin/settings/business-hours', icon: Clock },
     { label: 'Reportes', to: '/admin/reports', icon: FileBarChart },
   ],
   [ROLES.SALES_MANAGER]: [
