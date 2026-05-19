@@ -1,6 +1,5 @@
 import { RouterProvider } from 'react-router-dom';
 import { useEffect } from 'react';
-import { SpeedInsights } from '@vercel/speed-insights/react';
 import router from './router/index.jsx';
 import { useAuthStore } from './store/auth.store.js';
 import AppErrorBoundary from './components/common/AppErrorBoundary.jsx';
@@ -18,7 +17,6 @@ export default function App() {
   return (
     <AppErrorBoundary>
       <RouterProvider router={router} />
-      <SpeedInsights />
     </AppErrorBoundary>
   );
 }
