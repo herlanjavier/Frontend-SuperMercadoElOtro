@@ -5,11 +5,12 @@ import AdminPageHeader from '../../components/admin/AdminPageHeader.jsx';
 import ConfirmDialog from '../../components/admin/ConfirmDialog.jsx';
 import ProductAdminTable from '../../components/admin/ProductAdminTable.jsx';
 import EmptyState from '../../components/common/EmptyState.jsx';
+import Pagination from '../../components/common/Pagination.jsx';
 import { useAdminCategories } from '../../hooks/useAdminCategories.js';
 import { useAdminProducts } from '../../hooks/useAdminProducts.js';
 
 export default function AdminProductsPage() {
-  const { products, filters, setFilters, isLoading, error, refetch, deactivateProduct, restoreProduct, deleteImage } = useAdminProducts();
+  const { products, pagination, filters, setFilters, setPage, setLimit, isLoading, error, refetch, deactivateProduct, restoreProduct, deleteImage } = useAdminProducts();
   const { categories } = useAdminCategories({ includeInactive: true });
   const [confirm, setConfirm] = useState(null);
 
@@ -45,12 +46,15 @@ export default function AdminProductsPage() {
       {!isLoading && error ? <EmptyState title="No se pudieron cargar los productos" description={error} actionLabel="Reintentar" onAction={refetch} /> : null}
       {!isLoading && !error && products.length === 0 ? <EmptyState title="No hay productos" description="Crea el primer producto del catalogo." /> : null}
       {!isLoading && !error && products.length > 0 ? (
-        <ProductAdminTable
-          products={products}
-          onDeactivate={(product) => setConfirm({ type: 'deactivate', product })}
-          onRestore={(product) => setConfirm({ type: 'restore', product })}
-          onDeleteImage={(product) => setConfirm({ type: 'image', product })}
-        />
+        <>
+          <ProductAdminTable
+            products={products}
+            onDeactivate={(product) => setConfirm({ type: 'deactivate', product })}
+            onRestore={(product) => setConfirm({ type: 'restore', product })}
+            onDeleteImage={(product) => setConfirm({ type: 'image', product })}
+          />
+          <Pagination pagination={pagination} onPageChange={setPage} onLimitChange={setLimit} />
+        </>
       ) : null}
       <ConfirmDialog
         open={Boolean(confirm)}

@@ -1,13 +1,15 @@
 import { useCallback, useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
 import { supplierService } from '../services/supplier.service.js';
+import { DEFAULT_PAGINATION, getItemsFromResponse, getPaginationFromResponse } from '../utils/apiResponseHelpers.js';
 
-const defaultFilters = { search: '', includeInactive: true };
+const defaultFilters = { search: '', includeInactive: true, page: 1, limit: 20 };
 
 export function useSuppliers(autoLoad = true) {
   const [suppliers, setSuppliers] = useState([]);
   const [selectedSupplier, setSelectedSupplier] = useState(null);
   const [filters, setFiltersState] = useState(defaultFilters);
+  const [pagination, setPagination] = useState(DEFAULT_PAGINATION);
   const [isLoading, setIsLoading] = useState(autoLoad);
   const [isSaving, setIsSaving] = useState(false);
   const [error, setError] = useState('');
@@ -16,7 +18,9 @@ export function useSuppliers(autoLoad = true) {
     setIsLoading(true);
     setError('');
     try {
-      setSuppliers(await supplierService.getSuppliers(filters));
+      const result = await supplierService.getSuppliers(filters);
+      setSuppliers(getItemsFromResponse(result));
+      setPagination(getPaginationFromResponse(result));
     } catch (err) {
       const message = err.userMessage || 'No se pudieron cargar los proveedores.';
       setError(message);
@@ -60,10 +64,13 @@ export function useSuppliers(autoLoad = true) {
     suppliers,
     selectedSupplier,
     filters,
+    pagination,
     isLoading,
     isSaving,
     error,
-    setFilters: (next) => setFiltersState((current) => ({ ...current, ...next })),
+    setFilters: (next) => setFiltersState((current) => ({ ...current, ...next, page: next.page ?? 1 })),
+    setPage: (page) => setFiltersState((current) => ({ ...current, page })),
+    setLimit: (limit) => setFiltersState((current) => ({ ...current, limit, page: 1 })),
     fetchSuppliers,
     fetchSupplierById,
     refetch: fetchSuppliers,

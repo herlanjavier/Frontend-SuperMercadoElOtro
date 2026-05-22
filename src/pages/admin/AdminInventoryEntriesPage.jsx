@@ -3,12 +3,13 @@ import AdminFilters from '../../components/admin/AdminFilters.jsx';
 import AdminPageHeader from '../../components/admin/AdminPageHeader.jsx';
 import InventoryEntryList from '../../components/admin/InventoryEntryList.jsx';
 import EmptyState from '../../components/common/EmptyState.jsx';
+import Pagination from '../../components/common/Pagination.jsx';
 import { useAdminProducts } from '../../hooks/useAdminProducts.js';
 import { useInventory } from '../../hooks/useInventory.js';
 import { useSuppliers } from '../../hooks/useSuppliers.js';
 
 export default function AdminInventoryEntriesPage() {
-  const { entries, filters, setFilters, isLoading, error, refetch } = useInventory({ loadSummary: false, loadEntries: true });
+  const { entries, pagination, filters, setFilters, setPage, setLimit, isLoading, error, refetch } = useInventory({ loadSummary: false, loadEntries: true });
   const { products } = useAdminProducts();
   const { suppliers } = useSuppliers();
 
@@ -31,7 +32,12 @@ export default function AdminInventoryEntriesPage() {
       {isLoading ? <div className="soft-card h-72 animate-pulse rounded-[2rem]" /> : null}
       {!isLoading && error ? <EmptyState title="No se pudieron cargar las entradas" description={error} actionLabel="Reintentar" onAction={refetch} /> : null}
       {!isLoading && !error && entries.length === 0 ? <EmptyState title="No hay entradas" description="Registra entradas para actualizar el inventario." /> : null}
-      {!isLoading && !error && entries.length > 0 ? <InventoryEntryList entries={entries} /> : null}
+      {!isLoading && !error && entries.length > 0 ? (
+        <>
+          <InventoryEntryList entries={entries} />
+          <Pagination pagination={pagination} onPageChange={setPage} onLimitChange={setLimit} />
+        </>
+      ) : null}
     </div>
   );
 }

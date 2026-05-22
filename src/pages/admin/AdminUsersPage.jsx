@@ -6,12 +6,13 @@ import UserFilters from '../../components/admin/users/UserFilters.jsx';
 import UserTable from '../../components/admin/users/UserTable.jsx';
 import Button from '../../components/common/Button.jsx';
 import EmptyState from '../../components/common/EmptyState.jsx';
+import Pagination from '../../components/common/Pagination.jsx';
 import { useAdminUsers } from '../../hooks/useAdminUsers.js';
 
 const userName = (user) => `${user?.firstName || user?.first_name || ''} ${user?.lastName || user?.last_name || ''}`.trim() || 'este usuario';
 
 export default function AdminUsersPage() {
-  const { users, filters, setFilters, isLoading, error, refetch, deactivateUser } = useAdminUsers();
+  const { users, pagination, filters, setFilters, setPage, setLimit, isLoading, error, refetch, deactivateUser } = useAdminUsers();
   const [confirmUser, setConfirmUser] = useState(null);
 
   const runDeactivate = async () => {
@@ -38,7 +39,12 @@ export default function AdminUsersPage() {
       {!isLoading && !error && users.length === 0 ? (
         <EmptyState title="No hay usuarios" description="Ajusta los filtros o crea un encargado de ventas." />
       ) : null}
-      {!isLoading && !error && users.length > 0 ? <UserTable users={users} onDeactivate={setConfirmUser} /> : null}
+      {!isLoading && !error && users.length > 0 ? (
+        <>
+          <UserTable users={users} onDeactivate={setConfirmUser} />
+          <Pagination pagination={pagination} onPageChange={setPage} onLimitChange={setLimit} />
+        </>
+      ) : null}
 
       <div className="justify-self-start">
         <Button variant="secondary" icon={RefreshCw} onClick={refetch}>Actualizar listado</Button>

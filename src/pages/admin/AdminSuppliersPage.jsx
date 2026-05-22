@@ -5,10 +5,11 @@ import AdminPageHeader from '../../components/admin/AdminPageHeader.jsx';
 import ConfirmDialog from '../../components/admin/ConfirmDialog.jsx';
 import SupplierCard from '../../components/admin/SupplierCard.jsx';
 import EmptyState from '../../components/common/EmptyState.jsx';
+import Pagination from '../../components/common/Pagination.jsx';
 import { useSuppliers } from '../../hooks/useSuppliers.js';
 
 export default function AdminSuppliersPage() {
-  const { suppliers, filters, setFilters, isLoading, error, refetch, deactivateSupplier, restoreSupplier } = useSuppliers();
+  const { suppliers, pagination, filters, setFilters, setPage, setLimit, isLoading, error, refetch, deactivateSupplier, restoreSupplier } = useSuppliers();
   const [confirm, setConfirm] = useState(null);
 
   const runConfirm = async () => {
@@ -30,11 +31,14 @@ export default function AdminSuppliersPage() {
       {!isLoading && error ? <EmptyState title="No se pudieron cargar los proveedores" description={error} actionLabel="Reintentar" onAction={refetch} /> : null}
       {!isLoading && !error && suppliers.length === 0 ? <EmptyState title="No hay proveedores" description="Crea proveedores para asociarlos al inventario." /> : null}
       {!isLoading && !error && suppliers.length > 0 ? (
-        <section className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
-          {suppliers.map((supplier) => (
-            <SupplierCard key={supplier.id} supplier={supplier} onDeactivate={(s) => setConfirm({ type: 'deactivate', supplier: s })} onRestore={(s) => setConfirm({ type: 'restore', supplier: s })} />
-          ))}
-        </section>
+        <>
+          <section className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+            {suppliers.map((supplier) => (
+              <SupplierCard key={supplier.id} supplier={supplier} onDeactivate={(s) => setConfirm({ type: 'deactivate', supplier: s })} onRestore={(s) => setConfirm({ type: 'restore', supplier: s })} />
+            ))}
+          </section>
+          <Pagination pagination={pagination} onPageChange={setPage} onLimitChange={setLimit} />
+        </>
       ) : null}
       <ConfirmDialog
         open={Boolean(confirm)}

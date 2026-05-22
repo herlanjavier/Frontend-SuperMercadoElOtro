@@ -1,8 +1,9 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import toast from 'react-hot-toast';
 import { salesOrderService } from '../services/sales-order.service.js';
+import { DEFAULT_PAGINATION, getItemsFromResponse, getPaginationFromResponse } from '../utils/apiResponseHelpers.js';
 
-const defaultFilters = { status: '', search: '', from: '', to: '' };
+const defaultFilters = { status: '', search: '', from: '', to: '', page: 1, limit: 20 };
 const pendingRequests = new Map();
 const responseCache = new Map();
 const CACHE_TTL_MS = 2000;
@@ -46,6 +47,7 @@ const useDebouncedValue = (value, delay = 350) => {
 export function useSalesOrders(initialFilters = {}) {
   const initialState = useMemo(() => ({ ...defaultFilters, ...initialFilters }), [initialFilters]);
   const [orders, setOrders] = useState([]);
+  const [pagination, setPagination] = useState(DEFAULT_PAGINATION);
   const [filters, setFiltersState] = useState(initialState);
   const filtersRef = useRef(initialState);
   const debouncedFilters = useDebouncedValue(filters);
@@ -60,7 +62,9 @@ export function useSalesOrders(initialFilters = {}) {
     setIsLoading(true);
     setError('');
     try {
-      setOrders(await getOrdersOnce(nextFilters));
+      const result = await getOrdersOnce(nextFilters);
+      setOrders(getItemsFromResponse(result));
+      setPagination(getPaginationFromResponse(result));
     } catch (err) {
       const message = err.userMessage || 'No se pudieron cargar los pedidos.';
       setError(message);
@@ -76,10 +80,13 @@ export function useSalesOrders(initialFilters = {}) {
 
   return {
     orders,
+    pagination,
     filters,
     isLoading,
     error,
     refetch: fetchOrders,
-    setFilters: (next) => setFiltersState((current) => ({ ...current, ...next })),
+    setFilters: (next) => setFiltersState((current) => ({ ...current, ...next, page: next.page ?? 1 })),
+    setPage: (page) => setFiltersState((current) => ({ ...current, page })),
+    setLimit: (limit) => setFiltersState((current) => ({ ...current, limit, page: 1 })),
   };
 }

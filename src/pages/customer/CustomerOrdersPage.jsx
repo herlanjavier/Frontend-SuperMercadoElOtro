@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { ShoppingBag, XCircle } from 'lucide-react';
 import Button from '../../components/common/Button.jsx';
 import EmptyState from '../../components/common/EmptyState.jsx';
+import Pagination from '../../components/common/Pagination.jsx';
 import OrderCard from '../../components/customer/OrderCard.jsx';
 import OrderFilters from '../../components/customer/OrderFilters.jsx';
 import { useCustomerOrders } from '../../hooks/useCustomerOrders.js';
@@ -20,7 +21,7 @@ function OrderSkeleton() {
 export default function CustomerOrdersPage() {
   const navigate = useNavigate();
   const [orderToCancel, setOrderToCancel] = useState(null);
-  const { orders, isLoading, error, filters, setFilters, clearFilters, refetch, cancelOrderById } = useCustomerOrders();
+  const { orders, pagination, isLoading, error, filters, setFilters, setPage, setLimit, clearFilters, refetch, cancelOrderById } = useCustomerOrders();
 
   const confirmCancel = async () => {
     if (!orderToCancel) return;
@@ -63,11 +64,14 @@ export default function CustomerOrdersPage() {
       ) : null}
 
       {!isLoading && !error && orders.length > 0 ? (
-        <section className="grid gap-4 xl:grid-cols-2">
-          {orders.map((order) => (
-            <OrderCard key={order.id} order={order} onCancel={setOrderToCancel} />
-          ))}
-        </section>
+        <>
+          <section className="grid gap-4 xl:grid-cols-2">
+            {orders.map((order) => (
+              <OrderCard key={order.id} order={order} onCancel={setOrderToCancel} />
+            ))}
+          </section>
+          <Pagination pagination={pagination} onPageChange={setPage} onLimitChange={setLimit} />
+        </>
       ) : null}
 
       {orderToCancel ? (

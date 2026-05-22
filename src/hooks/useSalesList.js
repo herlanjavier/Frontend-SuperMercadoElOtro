@@ -1,8 +1,9 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import toast from 'react-hot-toast';
 import { salesService } from '../services/sales.service.js';
+import { DEFAULT_PAGINATION, getItemsFromResponse, getPaginationFromResponse } from '../utils/apiResponseHelpers.js';
 
-const defaultFilters = { search: '', from: '', to: '', customerId: '', soldBy: '' };
+const defaultFilters = { search: '', from: '', to: '', customerId: '', soldBy: '', page: 1, limit: 20 };
 const pendingRequests = new Map();
 const responseCache = new Map();
 const CACHE_TTL_MS = 2000;
@@ -46,6 +47,7 @@ const useDebouncedValue = (value, delay = 350) => {
 export function useSalesList(initialFilters = {}) {
   const initialState = useMemo(() => ({ ...defaultFilters, ...initialFilters }), [initialFilters]);
   const [sales, setSales] = useState([]);
+  const [pagination, setPagination] = useState(DEFAULT_PAGINATION);
   const [filters, setFiltersState] = useState(initialState);
   const filtersRef = useRef(initialState);
   const debouncedFilters = useDebouncedValue(filters);
@@ -60,7 +62,9 @@ export function useSalesList(initialFilters = {}) {
     setIsLoading(true);
     setError('');
     try {
-      setSales(await getSalesOnce(nextFilters));
+      const result = await getSalesOnce(nextFilters);
+      setSales(getItemsFromResponse(result));
+      setPagination(getPaginationFromResponse(result));
     } catch (err) {
       const message = err.userMessage || 'No se pudieron cargar las ventas.';
       setError(message);
@@ -74,5 +78,15 @@ export function useSalesList(initialFilters = {}) {
     fetchSales(debouncedFilters);
   }, [debouncedFilters, fetchSales]);
 
-  return { sales, filters, isLoading, error, refetch: fetchSales, setFilters: (next) => setFiltersState((current) => ({ ...current, ...next })) };
+  return {
+    sales,
+    pagination,
+    filters,
+    isLoading,
+    error,
+    refetch: fetchSales,
+    setFilters: (next) => setFiltersState((current) => ({ ...current, ...next, page: next.page ?? 1 })),
+    setPage: (page) => setFiltersState((current) => ({ ...current, page })),
+    setLimit: (limit) => setFiltersState((current) => ({ ...current, limit, page: 1 })),
+  };
 }

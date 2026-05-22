@@ -1,12 +1,14 @@
 import { useCallback, useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
 import { inventoryService } from '../services/inventory.service.js';
+import { DEFAULT_PAGINATION, getItemsFromResponse, getPaginationFromResponse } from '../utils/apiResponseHelpers.js';
 
-const defaultFilters = { isRead: '', type: '' };
+const defaultFilters = { isRead: '', type: '', page: 1, limit: 20 };
 
 export function useInventoryNotifications() {
   const [notifications, setNotifications] = useState([]);
   const [filters, setFiltersState] = useState(defaultFilters);
+  const [pagination, setPagination] = useState(DEFAULT_PAGINATION);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState('');
 
@@ -14,7 +16,9 @@ export function useInventoryNotifications() {
     setIsLoading(true);
     setError('');
     try {
-      setNotifications(await inventoryService.getInventoryNotifications(filters));
+      const result = await inventoryService.getInventoryNotifications(filters);
+      setNotifications(getItemsFromResponse(result));
+      setPagination(getPaginationFromResponse(result));
     } catch (err) {
       const message = err.userMessage || 'No se pudieron cargar las notificaciones.';
       setError(message);
@@ -50,12 +54,15 @@ export function useInventoryNotifications() {
 
   return {
     notifications,
+    pagination,
     filters,
     isLoading,
     error,
     fetchNotifications,
     markAsRead,
     markAllAsRead,
-    setFilters: (next) => setFiltersState((current) => ({ ...current, ...next })),
+    setFilters: (next) => setFiltersState((current) => ({ ...current, ...next, page: next.page ?? 1 })),
+    setPage: (page) => setFiltersState((current) => ({ ...current, page })),
+    setLimit: (limit) => setFiltersState((current) => ({ ...current, limit, page: 1 })),
   };
 }

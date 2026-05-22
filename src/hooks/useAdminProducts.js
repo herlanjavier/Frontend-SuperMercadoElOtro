@@ -1,13 +1,15 @@
 import { useCallback, useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
 import { adminProductService } from '../services/admin-product.service.js';
+import { DEFAULT_PAGINATION, getItemsFromResponse, getPaginationFromResponse } from '../utils/apiResponseHelpers.js';
 
-const defaultFilters = { search: '', categoryId: '', includeInactive: true, onlyAvailable: false, lowStock: false, criticalStock: false };
+const defaultFilters = { search: '', categoryId: '', includeInactive: true, onlyAvailable: false, lowStock: false, criticalStock: false, page: 1, limit: 20 };
 
 export function useAdminProducts(autoLoad = true) {
   const [products, setProducts] = useState([]);
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [filters, setFiltersState] = useState(defaultFilters);
+  const [pagination, setPagination] = useState(DEFAULT_PAGINATION);
   const [isLoading, setIsLoading] = useState(autoLoad);
   const [isSaving, setIsSaving] = useState(false);
   const [error, setError] = useState('');
@@ -16,7 +18,9 @@ export function useAdminProducts(autoLoad = true) {
     setIsLoading(true);
     setError('');
     try {
-      setProducts(await adminProductService.getAdminProducts(filters));
+      const result = await adminProductService.getAdminProducts(filters);
+      setProducts(getItemsFromResponse(result));
+      setPagination(getPaginationFromResponse(result));
     } catch (err) {
       const message = err.userMessage || 'No se pudieron cargar los productos.';
       setError(message);
@@ -59,10 +63,13 @@ export function useAdminProducts(autoLoad = true) {
     products,
     selectedProduct,
     filters,
+    pagination,
     isLoading,
     isSaving,
     error,
-    setFilters: (next) => setFiltersState((current) => ({ ...current, ...next })),
+    setFilters: (next) => setFiltersState((current) => ({ ...current, ...next, page: next.page ?? 1 })),
+    setPage: (page) => setFiltersState((current) => ({ ...current, page })),
+    setLimit: (limit) => setFiltersState((current) => ({ ...current, limit, page: 1 })),
     refetch: fetchProducts,
     fetchProducts,
     fetchProductById,

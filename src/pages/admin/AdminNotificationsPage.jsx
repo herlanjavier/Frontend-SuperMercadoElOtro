@@ -3,10 +3,11 @@ import AdminPageHeader from '../../components/admin/AdminPageHeader.jsx';
 import NotificationCard from '../../components/admin/NotificationCard.jsx';
 import Button from '../../components/common/Button.jsx';
 import EmptyState from '../../components/common/EmptyState.jsx';
+import Pagination from '../../components/common/Pagination.jsx';
 import { useInventoryNotifications } from '../../hooks/useInventoryNotifications.js';
 
 export default function AdminNotificationsPage() {
-  const { notifications, filters, setFilters, isLoading, error, fetchNotifications, markAsRead, markAllAsRead } = useInventoryNotifications();
+  const { notifications, pagination, filters, setFilters, setPage, setLimit, isLoading, error, fetchNotifications, markAsRead, markAllAsRead } = useInventoryNotifications();
 
   return (
     <div className="grid gap-6">
@@ -30,9 +31,12 @@ export default function AdminNotificationsPage() {
       {!isLoading && error ? <EmptyState title="No se pudieron cargar las notificaciones" description={error} actionLabel="Reintentar" onAction={fetchNotifications} /> : null}
       {!isLoading && !error && notifications.length === 0 ? <EmptyState title="Sin notificaciones" description="No hay alertas con los filtros actuales." /> : null}
       {!isLoading && !error && notifications.length > 0 ? (
-        <section className="grid gap-3">
-          {notifications.map((notification) => <NotificationCard key={notification.id} notification={notification} onRead={markAsRead} />)}
-        </section>
+        <>
+          <section className="grid gap-3">
+            {notifications.map((notification) => <NotificationCard key={notification.id} notification={notification} onRead={markAsRead} />)}
+          </section>
+          <Pagination pagination={pagination} onPageChange={setPage} onLimitChange={setLimit} />
+        </>
       ) : null}
     </div>
   );

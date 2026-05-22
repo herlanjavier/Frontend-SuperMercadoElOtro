@@ -1,13 +1,15 @@
 import { useCallback, useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
 import { inventoryService } from '../services/inventory.service.js';
+import { DEFAULT_PAGINATION, getItemsFromResponse, getPaginationFromResponse } from '../utils/apiResponseHelpers.js';
 
-const defaultFilters = { productId: '', supplierId: '', date: '', from: '', to: '', search: '' };
+const defaultFilters = { productId: '', supplierId: '', date: '', from: '', to: '', search: '', page: 1, limit: 20 };
 
 export function useInventory({ loadSummary = true, loadEntries = false } = {}) {
   const [summary, setSummary] = useState(null);
   const [entries, setEntries] = useState([]);
   const [filters, setFiltersState] = useState(defaultFilters);
+  const [pagination, setPagination] = useState(DEFAULT_PAGINATION);
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
   const [error, setError] = useState('');
@@ -26,7 +28,9 @@ export function useInventory({ loadSummary = true, loadEntries = false } = {}) {
   const fetchEntries = useCallback(async () => {
     setError('');
     try {
-      setEntries(await inventoryService.getInventoryEntries(filters));
+      const result = await inventoryService.getInventoryEntries(filters);
+      setEntries(getItemsFromResponse(result));
+      setPagination(getPaginationFromResponse(result));
     } catch (err) {
       const message = err.userMessage || 'No se pudieron cargar las entradas.';
       setError(message);
@@ -64,11 +68,14 @@ export function useInventory({ loadSummary = true, loadEntries = false } = {}) {
   return {
     summary,
     entries,
+    pagination,
     filters,
     isLoading,
     isSaving,
     error,
-    setFilters: (next) => setFiltersState((current) => ({ ...current, ...next })),
+    setFilters: (next) => setFiltersState((current) => ({ ...current, ...next, page: next.page ?? 1 })),
+    setPage: (page) => setFiltersState((current) => ({ ...current, page })),
+    setLimit: (limit) => setFiltersState((current) => ({ ...current, limit, page: 1 })),
     fetchSummary,
     fetchEntries,
     createEntry,

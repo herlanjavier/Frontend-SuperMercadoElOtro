@@ -1,12 +1,14 @@
 import { useCallback, useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
 import { customerOrderService } from '../services/customer-order.service.js';
+import { DEFAULT_PAGINATION, getItemsFromResponse, getPaginationFromResponse } from '../utils/apiResponseHelpers.js';
 
-const defaultFilters = { status: '', from: '', to: '' };
+const defaultFilters = { status: '', from: '', to: '', page: 1, limit: 20 };
 
 export function useCustomerOrders(initialFilters = defaultFilters) {
   const [orders, setOrders] = useState([]);
-  const [filters, setFilters] = useState(initialFilters);
+  const [filters, setFilters] = useState({ ...defaultFilters, ...initialFilters });
+  const [pagination, setPagination] = useState(DEFAULT_PAGINATION);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState('');
 
@@ -15,7 +17,8 @@ export function useCustomerOrders(initialFilters = defaultFilters) {
     setError('');
     try {
       const data = await customerOrderService.getMyOrders(filters);
-      setOrders(Array.isArray(data) ? data : []);
+      setOrders(getItemsFromResponse(data));
+      setPagination(getPaginationFromResponse(data));
     } catch (err) {
       const message = err.userMessage || 'No se pudieron cargar tus pedidos.';
       setError(message);
@@ -40,8 +43,20 @@ export function useCustomerOrders(initialFilters = defaultFilters) {
     }
   };
 
-  const updateFilters = (next) => setFilters((current) => ({ ...current, ...next }));
+  const updateFilters = (next) => setFilters((current) => ({ ...current, ...next, page: next.page ?? 1 }));
   const clearFilters = () => setFilters(defaultFilters);
 
-  return { orders, isLoading, error, filters, setFilters: updateFilters, clearFilters, refetch: fetchOrders, cancelOrderById };
+  return {
+    orders,
+    pagination,
+    isLoading,
+    error,
+    filters,
+    setFilters: updateFilters,
+    setPage: (page) => setFilters((current) => ({ ...current, page })),
+    setLimit: (limit) => setFilters((current) => ({ ...current, limit, page: 1 })),
+    clearFilters,
+    refetch: fetchOrders,
+    cancelOrderById,
+  };
 }

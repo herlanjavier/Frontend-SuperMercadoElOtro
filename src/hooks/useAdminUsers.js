@@ -1,20 +1,15 @@
 import { useCallback, useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
 import { adminUserService } from '../services/admin-user.service.js';
+import { DEFAULT_PAGINATION, getItemsFromResponse, getPaginationFromResponse } from '../utils/apiResponseHelpers.js';
 
-const defaultFilters = { search: '', role: '', isActive: '' };
-
-const normalizeUsers = (data) => {
-  if (Array.isArray(data)) return data;
-  if (Array.isArray(data?.users)) return data.users;
-  if (Array.isArray(data?.items)) return data.items;
-  return [];
-};
+const defaultFilters = { search: '', role: '', isActive: '', page: 1, limit: 20 };
 
 export function useAdminUsers(autoLoad = true) {
   const [users, setUsers] = useState([]);
   const [selectedUser, setSelectedUser] = useState(null);
   const [filters, setFiltersState] = useState(defaultFilters);
+  const [pagination, setPagination] = useState(DEFAULT_PAGINATION);
   const [isLoading, setIsLoading] = useState(autoLoad);
   const [isSaving, setIsSaving] = useState(false);
   const [error, setError] = useState('');
@@ -24,7 +19,8 @@ export function useAdminUsers(autoLoad = true) {
     setError('');
     try {
       const result = await adminUserService.getUsers(filters);
-      setUsers(normalizeUsers(result));
+      setUsers(getItemsFromResponse(result));
+      setPagination(getPaginationFromResponse(result));
     } catch (err) {
       const message = err.userMessage || 'No se pudieron cargar los usuarios.';
       setError(message);
@@ -74,10 +70,13 @@ export function useAdminUsers(autoLoad = true) {
     users,
     selectedUser,
     filters,
+    pagination,
     isLoading,
     isSaving,
     error,
-    setFilters: (next) => setFiltersState((current) => ({ ...current, ...next })),
+    setFilters: (next) => setFiltersState((current) => ({ ...current, ...next, page: next.page ?? 1 })),
+    setPage: (page) => setFiltersState((current) => ({ ...current, page })),
+    setLimit: (limit) => setFiltersState((current) => ({ ...current, limit, page: 1 })),
     refetch: fetchUsers,
     fetchUsers,
     fetchUserById,
