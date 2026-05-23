@@ -13,6 +13,7 @@ import { formatCurrency } from '../../utils/formatters.js';
 import { getDashboardPathByRole } from '../../utils/roleRedirect.js';
 import { getProductImage, isProductAvailable } from '../../utils/productHelpers.js';
 import { ROLES } from '../../utils/constants.js';
+import { getItemsFromResponse } from '../../utils/apiResponseHelpers.js';
 
 const loginMessage = 'Inicia sesión o crea una cuenta para comprar.';
 
@@ -33,10 +34,10 @@ export default function ProductPreview() {
     try {
       setIsLoading(true);
       setError('');
-      const data = await productService.getProducts({ onlyAvailable: true });
-      setProducts(Array.isArray(data) ? data.slice(0, 8) : []);
+      const data = await productService.getProducts({ onlyAvailable: true, limit: 8 }, { skipAuth: true });
+      setProducts(getItemsFromResponse(data).slice(0, 8));
     } catch (err) {
-      setError(err.userMessage || err?.message || 'No se pudieron cargar los productos disponibles.');
+      setError(err.userMessage || err?.message || 'No se pudieron cargar los productos destacados.');
       setProducts([]);
     } finally {
       setIsLoading(false);

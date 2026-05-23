@@ -6,8 +6,8 @@ const cleanParams = (params = {}) =>
   );
 
 export const productService = {
-  async getProducts(params = {}) {
-    const { data } = await api.get('/products', { params: cleanParams(params) });
+  async getProducts(params = {}, options = {}) {
+    const { data } = await api.get('/products', { params: cleanParams(params), skipAuth: Boolean(options.skipAuth) });
     return data.data;
   },
 
